@@ -1,6 +1,8 @@
 from tkinter import *
 from tkinter import Tk, ttk
 from tkinter import messagebox
+import csv
+
 
 
 # cores -----------------------------
@@ -33,38 +35,61 @@ l_linha = Label(frame_cima, text='', width=275, anchor=NW, font=('Ivy 1'), bg=co
 l_linha.place(x=10, y=45)
 
 
-credenciais = ['joao', '123456789']
+
+global credenciais_nome
+global credenciais_senha
+
+
+
 
 # verificar login
 def verificar_senha():
+    global credenciais_nome
+    global credenciais_senha
+
     nome = e_nome.get()
     senha = e_pass.get()
 
-    if nome =='admin' and senha =='admin':
-        messagebox.showinfo('Login', 'Seja bem vindo (a) Admin !!!')
-    elif credenciais[0] == nome and credenciais[1] == senha:
-        messagebox.showinfo('Login', 'Seja bem vindo ' + credenciais[0])
+    with open('text.csv', 'r') as arq_csv:
+        leitor_csv = csv.reader(arq_csv)
+        for linha in leitor_csv:
+            credenciais_nome = linha[0]
+            credenciais_senha = linha[1]
 
-        # deletar itens presente no frame
-        for widget in frame_baixo.winfo_children():
-            widget.destroy()
+            if nome =='admin' and senha =='admin':
+                messagebox.showinfo('Login', 'Seja bem vindo (a) Admin !!!')
+                break
 
-        for widget in frame_cima.winfo_children():
-            widget.destroy()
-        nova_janela()
-    else:
-        messagebox.showwarning('ERRO', 'Verifique seu nome ou senha')
+            elif credenciais_nome == nome and credenciais_senha == senha:
+                messagebox.showinfo('Login', 'Seja bem vindo ' + credenciais_nome)
+                # deletar itens presente no frame
+                for widget in frame_baixo.winfo_children():
+                    widget.destroy()
 
-#
+                for widget in frame_cima.winfo_children():
+                    widget.destroy()
+
+                nova_janela()
+                break
+
+            else:
+                messagebox.showwarning('ERRO', 'Verifique seu nome ou sua senha !!!')
+                break
+
+
+
+
 def nova_janela():
-    l_nome = Label(frame_cima, text='Usuario: '+credenciais[0], anchor=NE, font=('Ivy 20'), bg=co1, fg=co4)
+    l_nome = Label(frame_cima, text='Usuario: '+credenciais_nome, anchor=NE, font=('Ivy 20'), bg=co1, fg=co4)
     l_nome.place(x=5, y=5)
 
     l_linha = Label(frame_cima, text='', width=275, anchor=NW, font=('Ivy 1'), bg=co2, fg=co4)
     l_linha.place(x=10, y=45)
 
-    l_nome = Label(frame_baixo, text='Seja Bem Vindo(a) ' + credenciais[0], anchor=NE, font=('Ivy 20'), bg=co1, fg=co4)
+    l_nome = Label(frame_baixo, text='Seja Bem Vindo(a) ' +credenciais_nome, anchor=NE, font=('Ivy 20'), bg=co1, fg=co4)
     l_nome.place(x=5, y=105)
+
+
 
 # frame baixo
 l_nome = Label(frame_baixo, text='Nome *', anchor=NE, font=('Ivy 10'), bg=co1, fg=co4)
@@ -78,7 +103,8 @@ e_pass = Entry(frame_baixo, width=25, show='*', justify='left', font=("", 15), h
 e_pass.place(x=14, y=130)
 
 b_confirmar = Button(frame_baixo, command=verificar_senha, text='Entrar', width=39, height=2, font=('Ivy 8 bold'), bg=co2, fg=co1, relief=RAISED, overrelief=RIDGE)
-b_confirmar.place(x=15, y=180)
+b_confirmar.place(x=15, y=180) #x=5
+
 
 
 janela.mainloop()
